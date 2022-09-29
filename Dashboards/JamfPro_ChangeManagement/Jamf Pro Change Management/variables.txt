@@ -1,0 +1,1 @@
+$yourIndex$ - Replace this with your index name, you can find this in your HEC Data input that Jamf is using

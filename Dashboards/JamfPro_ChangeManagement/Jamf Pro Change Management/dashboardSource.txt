@@ -1,0 +1,35 @@
+dashboard version="1.1" theme="dark">
+<label>Jamf Pro Change Management</label>
+<row>
+<panel>
+<title>Changes Over Time</title>
+<chart>
+<search>
+<query>
+index="$yourIndex$" \[CREATE\] OR \[UPDATE\] OR \[DELETE\] | rex "\[(?<cm_user>.*?) \(ID: (?<cm_user_id>\d+)\)\] \[(?<cm_mod_type>.*?)\] \[(?<cm_mod_item_class>.*?)\] \[(?<cm_mod_datetime>.*?)\]\n.*\n Name \.* (?<cm_mod_item_name>.*?)\n" | timechart count by cm_mod_type
+</query>
+<earliest>-30d@d</earliest>
+<latest>now</latest>
+</search>
+<option name="charting.chart">column</option>
+<option name="charting.drilldown">none</option>
+<option name="refresh.display">progressbar</option>
+</chart>
+</panel>
+</row>
+<row>
+<panel>
+<event>
+<search>
+<query>
+index="$yourIndex$" \[CREATE\] OR \[UPDATE\] OR \[DELETE\] | rex "\[(?<cm_user>.*?) \(ID: (?<cm_user_id>\d+)\)\] \[(?<cm_mod_type>.*?)\] \[(?<cm_mod_item_class>.*?)\] \[(?<cm_mod_datetime>.*?)\]\n.*\n Name \.* (?<cm_mod_item_name>.*?)\n"
+</query>
+<earliest>-30d@d</earliest>
+<latest>now</latest>
+</search>
+<option name="list.drilldown">none</option>
+<option name="refresh.display">progressbar</option>
+</event>
+</panel>
+</row>
+</dashboard>
