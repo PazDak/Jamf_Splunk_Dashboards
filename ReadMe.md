@@ -12,4 +12,4 @@ Replace the variables to fit your environment, most notably the INDEX. If you us
 
 # Questions
 
-Raise an issue with the repo and I can help you with any of the dashboards or reach out to the MacAdmins #Splunk channel
+Raise an issue with the repo and I can help you with any of the dashboards or reach out to the MacAdmins #Splunk channel for help
