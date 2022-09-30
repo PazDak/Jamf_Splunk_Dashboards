@@ -1,0 +1,137 @@
+<form theme="dark">
+  <label>Jamf Pro Devices - Mobile Device History</label>
+  <description>Jamf Mobile Device Details page with ability to jump back in time.</description>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="jssID">
+      <label>Jamf Pro ID</label>
+      <choice value="*">Any</choice>
+      <search>
+        <query>
+index="$yourIndex$" sourcetype="jssMobileDevice*" deviceMeta.id="*" deviceMeta.reportDateEpoch="*" deviceMeta.assigned_user="$assignedUser$" deviceMeta.eventId="*" | stats count by deviceMeta.id
+</query>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>deviceMeta.id</fieldForLabel>
+      <fieldForValue>deviceMeta.id</fieldForValue>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="dropdown" token="assignedUser">
+      <label>Assigned User</label>
+      <choice value="*">Any</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <fieldForLabel>deviceMeta.assigned_user</fieldForLabel>
+      <fieldForValue>deviceMeta.assigned_user</fieldForValue>
+      <search>
+        <query>
+index="$yourIndex$" sourcetype="jssMobileDeviceapp" deviceMeta.id="$jssID$" | dedup deviceMeta.assigned_user | table deviceMeta.assigned_user
+</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="reportDate">
+      <label>Report Date</label>
+      <choice value="*">Any</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <fieldForLabel>deviceMeta.reportDateEpoch</fieldForLabel>
+      <fieldForValue>deviceMeta.reportDateEpoch</fieldForValue>
+      <search>
+        <query>
+index="$yourIndex$" sourcetype="jssMobileDevice*" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="*" deviceMeta.eventId="*" | stats count by deviceMeta.reportDateEpoch
+</query>
+      </search>
+    </input>
+    <input type="dropdown" token="eventID">
+      <label>Event ID</label>
+      <choice value="*">any</choice>
+      <fieldForLabel>deviceMeta.eventId</fieldForLabel>
+      <fieldForValue>deviceMeta.eventId</fieldForValue>
+      <search>
+        <query>
+index="$yourIndex$" sourcetype="jssMobileDevice*" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="$reportDate$" deviceMeta.eventId="*" | dedup deviceMeta.eventId| table deviceMeta.eventId
+</query>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Installed Applications Table</title>
+      <table>
+        <title>Installed Applications Table</title>
+        <search>
+          <query>index="$yourIndex$" sourcetype="jssMobileDevice:application" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="$reportDate$" deviceMeta.eventId="$eventID$"
+| table application.application_name, application.application_short_version, application.version, application.identifier, application.application_status</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Local Accounts</title>
+      <table>
+        <title>Machine Assigned User</title>
+        <search>
+          <query>index="$yourIndex$" sourcetype="jssMobileDevice:location" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="$reportDate$" deviceMeta.eventId="$eventID$" | table location.username, location.department, location.building, location.position</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Extension Attributes</title>
+      <table>
+        <search>
+          <query> index="$yourIndex$" sourcetype="jssMobileDevice:extensionAttribute" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="$reportDate$" deviceMeta.eventId="$eventID$" | table mobileDeviceEA.name, mobileDeviceEA.value, mobileDeviceEA.id</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>index="$yourIndex$" sourcetype="jssMobileDevice:deviceGroup" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="$reportDate$" deviceMeta.eventId="$eventID$"  mobileDeviceGroup.id="*"
+| table mobileDeviceGroup.id, mobileDeviceGroup.name</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Raw Events</title>
+      <event>
+        <search>
+          <query>
+index="$yourIndex$" sourcetype="jssMobileDevice*" deviceMeta.id="$jssID$" deviceMeta.reportDateEpoch="$reportDate$" deviceMeta.eventId="$eventID$"
+</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="list.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </event>
+    </panel>
+  </row>
+</form>
